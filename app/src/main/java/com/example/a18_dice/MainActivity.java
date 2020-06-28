@@ -2,6 +2,7 @@ package com.example.a18_dice;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -21,25 +22,25 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     //宣告顯示文字用的變數
     TextView player1_money, player2_money,
-            player1_result, player2_result,
-            message_text, total_bet,
-            state_message;
+             player1_result, player2_result,
+             message_text, total_bet,
+             state_message;
     //宣告按鈕用的變數
     Button plus_1, plus_10, plus_100, plus_1000;
     Button multi_2, division_2, bet_min, bet_max, bet_start;
     //宣告圖片用的變數
     ImageView[] dice1 = new ImageView[4],
-            dice2 = new ImageView[4];
+                dice2 = new ImageView[4];
 
     int bet_counter = 0, //設定起始下注總額
-            bet = 0, //設定下注基數
-            default_money = 100000, //設定預設金額
-            default_p1_money = default_money, //設定玩家1初始金額
-            default_p2_money = default_money, //設定玩家2初始金額
-            DIALOG_ID; //通知用變數
+        bet = 0, //設定下注基數
+        default_money = 100000, //設定預設金額
+        default_p1_money = default_money, //設定玩家1初始金額
+        default_p2_money = default_money, //設定玩家2初始金額
+        DIALOG_ID; //判斷用何種通知用變數
 
     String operator, //宣告判斷運算用字串變數
-            gambler = "player1"; //設定起始玩家
+           gambler = "player1"; //設定起始玩家
 
     player player1 = new player(); //將玩家1實體化
     player player2 = new player(); //將玩家2實體化
@@ -82,8 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 if (gambler.equals("player1")){
                                     for (int i=0; i<4; i++)
                                         change_image(dice1[i], dice_4[i]);
-                                }
-                                if (gambler.equals("player2")){
+                                } else if (gambler.equals("player2")){
                                     for (int i=0; i<4; i++)
                                         change_image(dice2[i], dice_4[i]);
                                 }
@@ -98,16 +98,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     score = chk_dice(dice_4);
                                     change_gambler_message(score, gambler);
                                     View.setText(String.valueOf(score + " 點"));
-                                    if (player1.get_score() != 0 && player2.get_score() !=0){
-                                        wolresult(player1.get_score(), player2.get_score());
-                                    }
+
                                     if (player1.get_score() != 0) {
                                         if (gambler.equals("player2")) {
                                             if (player2.get_score() == 0) {
                                                 state_message.setText("等待對手擲骰子..");
                                                 p2();
+
                                             }
                                         }
+                                    }
+                                    if (player1.get_score() != 0 && player2.get_score() !=0){
+                                        wolresult(player1.get_score(), player2.get_score());
                                     }
                                 }
                             }
@@ -259,20 +261,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (s == 0) {
             message_text.setText("無點數!\n重骰一次");
         }  else {
+            if (s == 100)
+                message_text.setText("十八啦!");
             if (g.equals("player1"))
                 gambler = "player2";
             if (g.equals("player2"))
                 gambler = "player1";
-            if (s == 100)
-                message_text.setText("十八啦!!");
         }
 
     }
 
     public void wolresult(int s1, int s2) {
         message_text.setText("");
+
         if (s1 > s2) {
-            message_text.setText("你贏了");
+            message_text.setText(MessageFormat.format("你贏了\n{0}元", bet_counter));
             player1.set_money(player1.get_money() + bet_counter);
             player2.set_money(player2.get_money() - bet_counter);
             bet_counter = 0;
@@ -280,8 +283,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             state_message.setText("換你下注");
 
         } else if (s1 < s2) {
-
-            message_text.setText("你輸了");
+            message_text.setText(MessageFormat.format("你輸了\n{0}元", bet_counter));
             player1.set_money(player1.get_money() - bet_counter);
             player2.set_money(player2.get_money() + bet_counter);
             bet_counter = 0;
@@ -313,6 +315,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         player1_money.setText(String.valueOf(player1.get_money()));
         player2_money.setText(String.valueOf(player2.get_money()));
     }
+
     public void p1(){
         bet_start.setEnabled(false);
         player1.play_dice(player1_result);
@@ -473,28 +476,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
-     /*ublic void delaysometime(int t, TextView View, String messaage){
+     public void delaysometime(int t, TextView View, String messaage){
              try{
-             runOnUiThread(new Runnable() {    //可以臨時交給UI做顯示
-                 public void run(){
-                 }
+                 
+                 runOnUiThread(new Runnable() {    //可以臨時交給UI做顯示
+                     public void run(){
+                     }
              });
-
-             for(int i=0;i<t;i++){
-                 Thread.sleep(1000);
-                 worker.post(delay_msg((View, messaage));
-             }
          } catch(Exception e){
              e.printStackTrace();
          }
      }
-     private void delay_msg(final TextView View, final String msg){
-         Runnable delay = new Runnable() {
-             @Override
-             public void run() {
-                 View.setText(msg);
-             }
-         };
-    }*/
 }
 
